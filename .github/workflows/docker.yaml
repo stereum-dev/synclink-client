@@ -24,6 +24,6 @@ jobs:
       - name: Build only
         uses: docker/build-push-action@v3
         with:
-          push: false
-          tags: sapien99/synclink-client:latest,sapien99/synclink-client:github.tag
+          push: true
+          tags: stereum-dev/synclink-client:latest,stereum-dev/synclink-client:${{github.ref_name}}
         if: startsWith(github.ref, 'refs/tags/v')
