@@ -27,7 +27,5 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           push: true
-          tags: 
-          - sapien99/synclink-client:latest
-          - sapien99/synclink-client:github.tag
+          tags: sapien99/synclink-client:latest,sapien99/synclink-client:github.tag
         if: startsWith(github.tag, 'v')
