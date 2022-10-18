@@ -12,9 +12,13 @@ class API:
         self.__client = httpx.AsyncClient(base_url=apiUrl)
 
     async def request(self, url_path):
-        response = await self.__client.get(url_path)
+        try:
+            response = await self.__client.get(url_path)
+            response.raise_for_status()
 
-        return response.json()
+            return response.json()
+        except Exception as exc:
+            print("ERROR: ", exc)
 
 
 class BeaconAPI(API):

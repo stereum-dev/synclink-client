@@ -1,5 +1,6 @@
 import uvicorn
 from fastapi import FastAPI
+from fastapi.logger import logger
 
 from config.config import read
 from core.functions import startup
