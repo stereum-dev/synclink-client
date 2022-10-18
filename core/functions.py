@@ -1,14 +1,14 @@
 import logging
 
 from config.config import read
+
 from core.node import Node
+from core.synclink import SynclinkClient
 
 
 async def startup():
     config = read('config.yaml')
 
-    n = Node(config['nodes'][0])
-    w = await n.is_working()
-    s = await n.is_not_syncing()
+    slc = SynclinkClient(config['nodes'])
 
-    print(w, s)
+    await slc.start()

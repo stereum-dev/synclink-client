@@ -1,10 +1,10 @@
 import math
+from typing import List
 
-from utils import hex_to_dec_string
+from models.get_state_finality_checkpoints_response_data import \
+    GetStateFinalityCheckpointsResponseData
 
-checkpoints_repeats = {}
-
-checkpoints = []
+from utils.eth import hex_to_dec_string
 
 
 def generate_key(checkpoint):
@@ -17,16 +17,19 @@ def generate_key(checkpoint):
     return key
 
 
-for checkpoint in checkpoints:
-    key = generate_key(checkpoint)
-    if key in checkpoints_repeats:
-        checkpoints_repeats[key]["count"] += 1
-    else:
-        checkpoints_repeats[key] = {
-            "finality": checkpoint,
-            "count": 1
-        }
+def decide_majority_checkpoint(checkpoints: List[GetStateFinalityCheckpointsResponseData]):
+    checkpoints_repeats = {}
 
-    for _, value in checkpoints_repeats.items():
-        if (value['count'] > math.floor(len(checkpoints) / 2)):
-            print(value['finality'])
+    for checkpoint in checkpoints:
+        key = generate_key(checkpoint)
+        if key in checkpoints_repeats:
+            checkpoints_repeats[key]["count"] += 1
+        else:
+            checkpoints_repeats[key] = {
+                "finality": checkpoint,
+                "count": 1
+            }
+
+        for _, value in checkpoints_repeats.items():
+            if (value['count'] > math.floor(len(checkpoints) / 2)):
+                return value['finality']

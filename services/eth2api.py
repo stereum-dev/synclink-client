@@ -1,8 +1,10 @@
 from http import client
-import httpx
 from urllib.parse import urljoin
-from models.get_syncing_status_response import GetSyncingStatusResponse
 
+import httpx
+from models.get_state_finality_checkpoints_response import \
+    GetStateFinalityCheckpointsResponse
+from models.get_syncing_status_response import GetSyncingStatusResponse
 from validators.content_type import ContentTypeSSZ
 
 
@@ -28,7 +30,7 @@ class BeaconAPI(API):
     async def block_root(self, block_id):
         return await self.request(f"/eth/v1/beacon/blocks/{block_id}/root")
 
-    async def state_finality_checkpoints(self, state_id):
+    async def state_finality_checkpoints(self, state_id) -> GetStateFinalityCheckpointsResponse:
         return await self.request(f"/eth/v1/beacon/states/{state_id}/finality_checkpoints")
 
     async def block(self, block_id):

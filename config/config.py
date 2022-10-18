@@ -1,6 +1,7 @@
-from platform import node
 import string
+from platform import node
 from typing import List
+
 import yaml
 from pydantic import BaseModel
 
@@ -8,7 +9,7 @@ from pydantic import BaseModel
 class AppConfig(BaseModel):
     addr: str
     port: int
-    node: List[str]
+    nodes: List[str]
 
 
 def read(file_name):
