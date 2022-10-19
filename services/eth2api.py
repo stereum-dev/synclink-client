@@ -1,11 +1,9 @@
-from http import client
 from urllib.parse import urljoin
 
 import httpx
 from models.get_state_finality_checkpoints_response import \
     GetStateFinalityCheckpointsResponse
 from models.get_syncing_status_response import GetSyncingStatusResponse
-from validators.content_type import ContentTypeSSZ
 
 
 class API:
