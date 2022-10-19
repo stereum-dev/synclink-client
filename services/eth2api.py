@@ -52,7 +52,9 @@ class ConfigAPI(API):
 
 class NodeAPI(API):
     async def syncing(self) -> GetSyncingStatusResponse:
-        return await self.request('/eth/v1/node/syncing')
+        res = await self.request('/eth/v1/node/syncing')
+
+        return GetSyncingStatusResponse(**res)
 
     async def version(self):
         return await self.request('/eth/v1/node/version')
