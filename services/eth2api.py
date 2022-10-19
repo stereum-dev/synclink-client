@@ -31,7 +31,9 @@ class BeaconAPI(API):
         return await self.request(f"/eth/v1/beacon/blocks/{block_id}/root")
 
     async def state_finality_checkpoints(self, state_id) -> GetStateFinalityCheckpointsResponse:
-        return await self.request(f"/eth/v1/beacon/states/{state_id}/finality_checkpoints")
+        res = await self.request(f"/eth/v1/beacon/states/{state_id}/finality_checkpoints")
+
+        return GetStateFinalityCheckpointsResponse(**res)
 
     async def block(self, block_id):
         return await self.request(f"/eth/v2/beacon/blocks/{block_id}")
