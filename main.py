@@ -5,13 +5,15 @@ from fastapi.logger import logger
 from config.config import read
 from core.functions import startup
 
+from routes.eth_handler import eth_router
+
 app = FastAPI(
     title="SyncLink Client API",
     description="Specification of the SyncLink Client API",
     version="0.1.0",
 )
 
-# app.include_router(eth_router, prefix='/eth')
+app.include_router(eth_router, prefix='/eth')
 
 
 @app.on_event("startup")

@@ -1,4 +1,5 @@
 from typing import List
+from models.get_state_finality_checkpoints_response_data import GetStateFinalityCheckpointsResponseData
 
 from utils.list import async_filter
 
@@ -24,5 +25,20 @@ class Nodes:
             return True
 
         ready_nodes = [i async for i in async_filter(check_is_ready, self.nodes)]
+
+        return ready_nodes
+
+    async def get_finalizes(self, checkpoint: GetStateFinalityCheckpointsResponseData, nodes: List[Node]) -> List[Node]:
+        nodes = nodes or self.nodes
+
+        async def is_finalized(node: Node):
+            finality_state = await node.api.beacon.state_finality_checkpoints('head')
+
+            if (not finality_state or (finality_state.data.finalized.epoch < checkpoint.finalized.epoch)):
+                return False
+
+            return True
+
+        ready_nodes = [i async for i in async_filter(is_finalized, nodes)]
 
         return ready_nodes

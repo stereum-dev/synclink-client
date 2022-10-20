@@ -1,6 +1,8 @@
+from distutils import core
 from config.config import read
-from fastapi import APIRouter, Header
+from fastapi import APIRouter, Header, Path, Query
 from fastapi.responses import JSONResponse, StreamingResponse
+import core.synclink
 from models.get_block_root_response import GetBlockRootResponse
 from models.get_block_v2_response import GetBlockV2Response
 from models.get_deposit_contract_response import GetDepositContractResponse
@@ -18,9 +20,7 @@ from services.eth2api import ETH2API
 from validators.content_type import (ContentTypeJSON, ContentTypeSSZ,
                                      validate_content_type)
 
-config = read(file_name='config.yaml')
-api = ETH2API(config['eth_api_address'])
-
+api = ETH2API('http://localhost:5051')
 
 eth_router = APIRouter()
 
@@ -128,4 +128,10 @@ async def handle_eth_v1_config_fork_schedule(content_type: str = Header(default=
 async def handle_eth_v2_debug_beacon_state(state_id, content_type: str = Header(default=ContentTypeSSZ)):
     validate_content_type(content_type, [ContentTypeSSZ])
 
-    return StreamingResponse(api.debug.bacon_state(state_id), media_type='application/json')
+    if (state_id == 'finalized'):
+        syncpoint = core.synclink.slc.syncpoint
+        api = core.synclink.slc.selected_ready_finalized_node.api
+
+        syncpoint_block = await api.beacon.block(syncpoint.finalized.root)
+
+        return StreamingResponse(api.debug.bacon_state(state_id=syncpoint_block.data.message.slot), media_type='application/json')

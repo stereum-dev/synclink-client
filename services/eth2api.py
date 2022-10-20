@@ -1,6 +1,8 @@
 from urllib.parse import urljoin
 
 import httpx
+from models.get_block_v2_response import GetBlockV2Response
+from models.get_spec_response import GetSpecResponse
 from models.get_state_finality_checkpoints_response import \
     GetStateFinalityCheckpointsResponse
 from models.get_syncing_status_response import GetSyncingStatusResponse
@@ -33,13 +35,17 @@ class BeaconAPI(API):
 
         return GetStateFinalityCheckpointsResponse(**res)
 
-    async def block(self, block_id):
-        return await self.request(f"/eth/v2/beacon/blocks/{block_id}")
+    async def block(self, block_id) -> GetBlockV2Response:
+        res = await self.request(f"/eth/v2/beacon/blocks/{block_id}")
+
+        return GetBlockV2Response(**res)
 
 
 class ConfigAPI(API):
     async def spec(self):
-        return await self.request('/eth/v1/config/spec')
+        res = await self.request('/eth/v1/config/spec')
+
+        return GetSpecResponse(**res)
 
     async def deposit_contract(self):
         return await self.request('/eth/v1/config/deposit_contract')
