@@ -134,4 +134,4 @@ async def handle_eth_v2_debug_beacon_state(state_id, content_type: str = Header(
 
         syncpoint_block = await api.beacon.block(syncpoint.finalized.root)
 
-        return StreamingResponse(api.debug.bacon_state(state_id=syncpoint_block.data.message.slot), media_type='application/json')
+        return StreamingResponse(api.debug.bacon_state(state_id=syncpoint_block.data.message.slot), headers={"Content-Type": "application/json"})
