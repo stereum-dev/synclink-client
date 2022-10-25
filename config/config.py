@@ -15,8 +15,8 @@ class AppConfig(BaseModel):
 def read(file_name):
     defaultConfig: AppConfig = {
         "addr": "0.0.0.0",
-        "port": 8000,
-        "nodes": ["http://localhost:5051"],
+        "port": 9000,
+        "nodes": ["http://localhost:8000"],
     }
 
     with open(file_name, "r") as f:
