@@ -3,7 +3,8 @@ import asyncio
 import random
 from typing import List
 
-from config.config import read
+from config.config import logger, read
+from loguru import logger
 from models.get_state_finality_checkpoints_response_data import \
     GetStateFinalityCheckpointsResponseData
 from utils.decide_majority_checkpoint import decide_majority_checkpoint
@@ -51,21 +52,21 @@ class SynclinkClient():
         self.syncpoint = checkpoint
 
     async def start(self):
-        ready_nodes = await self.nodes.get_readies()
+        logger.info('Searching for at least one ready node...')
 
+        ready_nodes = await self.nodes.get_readies()
         while not len(ready_nodes):
-            print('No ready node found! Will try in 5 sec..')
+            logger.warning('No ready node found! Will try in 5 sec..')
             ready_nodes = await self.nodes.get_readies()
             await asyncio.sleep(5)
+
+        logger.success(f"{str(len(ready_nodes))} ready node(s) found.")
 
         await self.get_head_finality()
         await self.check_final_checkpoint()
 
-        print(len(ready_nodes), 'ready node(s) found.')
-
-        print("-----CHECKPOINT RECOGNIZED-------")
-        print('------ROOT: ', self.syncpoint.finalized.root)
-        print('------EPOCH: ', self.syncpoint.finalized.epoch)
+        logger.success(f"ROOT: {self.syncpoint.finalized.root}")
+        logger.success(f"EPOCH: {self.syncpoint.finalized.epoch}")
 
 
 config = read('config.yaml')

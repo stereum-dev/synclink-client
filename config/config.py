@@ -3,6 +3,7 @@ from platform import node
 from typing import List
 
 import yaml
+from loguru import logger
 from pydantic import BaseModel
 
 

@@ -2,6 +2,7 @@ from urllib.parse import urljoin
 
 import httpx
 from apiclient_pydantic import response_serializer, serialize_all_methods
+from loguru import logger
 from models.get_block_v2_response import GetBlockV2Response
 from models.get_spec_response import GetSpecResponse
 from models.get_state_finality_checkpoints_response import \
@@ -21,7 +22,7 @@ class API:
 
             return response.json()
         except Exception as exc:
-            print("ERROR: ", exc)
+            logger.error(f"ERROR: {exc}")
 
 
 @serialize_all_methods()

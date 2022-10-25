@@ -1,8 +1,9 @@
 from distutils import core
-from config.config import read
-from fastapi import APIRouter, Header, Path, Query
-from fastapi.responses import JSONResponse, StreamingResponse
+
 import core.synclink
+from config.config import read
+from fastapi import APIRouter, Header
+from fastapi.responses import JSONResponse, StreamingResponse
 from models.get_block_root_response import GetBlockRootResponse
 from models.get_block_v2_response import GetBlockV2Response
 from models.get_deposit_contract_response import GetDepositContractResponse
