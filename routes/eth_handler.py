@@ -130,8 +130,8 @@ async def handle_eth_v2_debug_beacon_state(state_id, content_type: str = Header(
     validate_content_type(content_type, [ContentTypeSSZ])
 
     if (state_id == 'finalized'):
-        syncpoint = core.synclink.slc.syncpoint
-        api = core.synclink.slc.selected_ready_finalized_node.api
+        syncpoint = core.synclink.client.syncpoint
+        api = core.synclink.client.selected_ready_finalized_node.api
 
         syncpoint_block = await api.beacon.block(syncpoint.finalized.root)
 
