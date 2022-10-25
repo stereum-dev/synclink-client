@@ -4,7 +4,6 @@ from fastapi.logger import logger
 
 from config.config import read
 from core.functions import startup
-
 from routes.eth_handler import eth_router
 
 app = FastAPI(
