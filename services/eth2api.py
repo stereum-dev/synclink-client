@@ -1,6 +1,7 @@
 from urllib.parse import urljoin
 
 import httpx
+from apiclient_pydantic import response_serializer, serialize_all_methods
 from models.get_block_v2_response import GetBlockV2Response
 from models.get_spec_response import GetSpecResponse
 from models.get_state_finality_checkpoints_response import \
@@ -23,6 +24,7 @@ class API:
             print("ERROR: ", exc)
 
 
+@serialize_all_methods()
 class BeaconAPI(API):
     async def genesis(self):
         return await self.request('/eth/v1/beacon/genesis')
@@ -31,21 +33,16 @@ class BeaconAPI(API):
         return await self.request(f"/eth/v1/beacon/blocks/{block_id}/root")
 
     async def state_finality_checkpoints(self, state_id) -> GetStateFinalityCheckpointsResponse:
-        res = await self.request(f"/eth/v1/beacon/states/{state_id}/finality_checkpoints")
-
-        return GetStateFinalityCheckpointsResponse(**res)
+        return await self.request(f"/eth/v1/beacon/states/{state_id}/finality_checkpoints")
 
     async def block(self, block_id) -> GetBlockV2Response:
-        res = await self.request(f"/eth/v2/beacon/blocks/{block_id}")
-
-        return GetBlockV2Response(**res)
+        return await self.request(f"/eth/v2/beacon/blocks/{block_id}")
 
 
+@serialize_all_methods()
 class ConfigAPI(API):
-    async def spec(self):
-        res = await self.request('/eth/v1/config/spec')
-
-        return GetSpecResponse(**res)
+    async def spec(self) -> GetSpecResponse:
+        return await self.request('/eth/v1/config/spec')
 
     async def deposit_contract(self):
         return await self.request('/eth/v1/config/deposit_contract')
@@ -54,11 +51,10 @@ class ConfigAPI(API):
         return await self.request('/eth/v1/config/fork_schedule')
 
 
+@serialize_all_methods()
 class NodeAPI(API):
     async def syncing(self) -> GetSyncingStatusResponse:
-        res = await self.request('/eth/v1/node/syncing')
-
-        return GetSyncingStatusResponse(**res)
+        return await self.request('/eth/v1/node/syncing')
 
     async def version(self):
         return await self.request('/eth/v1/node/version')
