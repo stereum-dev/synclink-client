@@ -5,6 +5,7 @@
         "apscheduler",
         "fastapi",
         "httpx",
+        "loguru",
         "syncpoint",
         "uvicorn"
     ]
