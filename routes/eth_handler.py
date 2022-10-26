@@ -1,8 +1,8 @@
 from distutils import core
+from typing import Union
 
 import core.synclink
-from config.config import read
-from fastapi import APIRouter, Header
+from fastapi import APIRouter, Header, Query, Response
 from fastapi.responses import JSONResponse, StreamingResponse
 from models.get_block_root_response import GetBlockRootResponse
 from models.get_block_v2_response import GetBlockV2Response
@@ -87,6 +87,18 @@ async def handle_eth_v1_config_fork_schedule(content_type: str = Header(default=
     r = await api.config.fork_schedule()
 
     return JSONResponse(r)
+
+
+@eth_router.get("/v1/node/health/", tags=["Node"])
+async def handle_eth_v1_config_fork_schedule(
+    syncing_status: Union[str, None] = Query(
+        "206", description="Customize syncing status instead of default status code (206)",
+    ),
+):
+
+    r = await api.node.health(syncing_status)
+
+    return Response(status_code=r.status_code)
 
 
 @eth_router.get("/v1/node/syncing", tags=["Node"], response_model=GetSyncingStatusResponse)

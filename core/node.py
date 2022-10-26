@@ -8,9 +8,13 @@ class Node():
         self.api = ETH2API(url)
 
     async def is_working(self) -> bool:
-        r = await self.api.node.syncing()
+        r = await self.api.node.health()
 
-        return Boolean(r)
+        try:
+            r.raise_for_status()
+            return True
+        except:
+            return False
 
     async def is_syncing(self) -> bool:
         r = await self.api.node.syncing()

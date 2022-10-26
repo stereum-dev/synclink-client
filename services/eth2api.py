@@ -1,3 +1,4 @@
+from typing import Union
 from urllib.parse import urljoin
 
 import httpx
@@ -13,11 +14,11 @@ from models.get_syncing_status_response import GetSyncingStatusResponse
 class API:
     def __init__(self, apiUrl):
         self.apiUrl = apiUrl
-        self.__client = httpx.AsyncClient(base_url=apiUrl)
+        self.client = httpx.AsyncClient(base_url=apiUrl)
 
     async def request(self, url_path):
         try:
-            response = await self.__client.get(url_path)
+            response = await self.client.get(url_path)
             response.raise_for_status()
 
             return response.json()
@@ -54,6 +55,9 @@ class ConfigAPI(API):
 
 @serialize_all_methods()
 class NodeAPI(API):
+    async def health(self):
+        return await self.client.get('/eth/v1/node/health')
+
     async def syncing(self) -> GetSyncingStatusResponse:
         return await self.request('/eth/v1/node/syncing')
 
