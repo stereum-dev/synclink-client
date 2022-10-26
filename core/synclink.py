@@ -47,7 +47,7 @@ class SynclinkClient():
 
         if (int(block.data.message.slot) % int(spec.data['SLOTS_PER_EPOCH']) != 0):
             if (not len(ready_nodes)):
-                raise Exception('TODO: validate error block is not finalized')
+                logger.error('Validate error block is not finalized.')
 
         self.syncpoint = checkpoint
 
@@ -70,5 +70,4 @@ class SynclinkClient():
 
 
 config = read('config.yaml')
-
 client = SynclinkClient(config['nodes'])
