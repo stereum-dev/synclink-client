@@ -3,6 +3,7 @@ import asyncio
 import random
 from typing import List
 
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from config.config import logger, read
 from loguru import logger
 from models.get_state_finality_checkpoints_response_data import \
@@ -36,10 +37,17 @@ class SynclinkClient():
             self.head = final_head_checkpoint.copy()
 
     async def check_final_checkpoint(self):
+        if (not (self.head or self.head.finalized)):
+            return
+
+        if (self.syncpoint.finalized != None and self.head.finalized.epoch == self.syncpoint.finalized.epoch):
+            return
+
         checkpoint = self.head
 
         ready_nodes = await self.nodes.get_readies()
         finalized_nodes = await self.nodes.get_finalizes(nodes=ready_nodes, checkpoint=checkpoint)
+
         self.selected_ready_finalized_node = random.choice(finalized_nodes)
 
         block = await self.selected_ready_finalized_node.api.beacon.block(checkpoint.finalized.root)
@@ -50,6 +58,9 @@ class SynclinkClient():
                 logger.error('Validate error block is not finalized.')
 
         self.syncpoint = checkpoint
+
+        logger.success(f"ROOT: {self.syncpoint.finalized.root}")
+        logger.success(f"EPOCH: {self.syncpoint.finalized.epoch}")
 
     async def start(self):
         logger.info('Searching for at least one ready node...')
@@ -64,9 +75,22 @@ class SynclinkClient():
 
         await self.get_head_finality()
         await self.check_final_checkpoint()
+        while not self.syncpoint.finalized:
+            logger.warning('Not ready yet, searching for finality...')
+            await self.get_head_finality()
+            await self.check_final_checkpoint()
+            await asyncio.sleep(10)
 
-        logger.success(f"ROOT: {self.syncpoint.finalized.root}")
-        logger.success(f"EPOCH: {self.syncpoint.finalized.epoch}")
+        logger.success(f"Ready to use...")
+
+        self.scheduler = AsyncIOScheduler()
+
+        self.scheduler.add_job(self.get_head_finality, 'interval', seconds=10)
+
+        self.scheduler.add_job(self.check_final_checkpoint,
+                               'interval', seconds=30, max_instances=1)
+
+        self.scheduler.start()
 
 
 config = read('config.yaml')
