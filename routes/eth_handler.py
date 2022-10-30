@@ -91,18 +91,6 @@ async def handle_eth_v1_config_fork_schedule(content_type: str = Header(default=
     return GetForkScheduleResponse(data=fork_epochs)
 
 
-@eth_router.get("/v1/node/health/", tags=["Node"])
-async def handle_eth_v1_config_fork_schedule(
-    syncing_status: Union[str, None] = Query(
-        "206", description="Customize syncing status instead of default status code (206)",
-    ),
-):
-
-    r = await api.node.health(syncing_status)
-
-    return Response(status_code=r.status_code)
-
-
 @eth_router.get("/v1/node/syncing", tags=["Node"], response_model=GetSyncingStatusResponse)
 async def handle_eth_v1_config_fork_schedule(content_type: str = Header(default=ContentTypeJSON)):
     validate_content_type(content_type, [ContentTypeJSON])
