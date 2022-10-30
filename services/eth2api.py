@@ -1,8 +1,8 @@
-from typing import Union
 from urllib.parse import urljoin
 
 import httpx
-from apiclient_pydantic import response_serializer, serialize_all_methods
+from apiclient_pydantic import serialize_all_methods
+from core.config import Config
 from loguru import logger
 from models.get_block_v2_response import GetBlockV2Response
 from models.get_spec_response import GetSpecResponse
@@ -24,6 +24,15 @@ class API:
             return response.json()
         except Exception as exc:
             logger.error(f"ERROR: {exc}")
+
+
+@serialize_all_methods()
+class SynclinkClientAPI(API):
+    async def config(self) -> Config:
+        return await self.request('/synclink/v1/config')
+
+    async def is_ready(self):
+        return await self.client.get('/synclink/v1/ready')
 
 
 @serialize_all_methods()
@@ -81,6 +90,7 @@ class DebugAPI(API):
 class ETH2API:
     def __init__(self, apiUrl):
         self.apiUrl = apiUrl
+        self.synclink_server = SynclinkClientAPI(self.apiUrl)
         self.beacon = BeaconAPI(self.apiUrl)
         self.config = ConfigAPI(self.apiUrl)
         self.node = NodeAPI(self.apiUrl)

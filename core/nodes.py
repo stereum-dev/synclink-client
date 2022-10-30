@@ -12,17 +12,9 @@ class Nodes:
 
     async def get_readies(self) -> List[Node]:
         async def check_is_ready(node: Node):
-            health = await node.is_working()
+            is_ready = await node.is_ready()
 
-            if (not health):
-                return False
-
-            syncing = await node.is_syncing()
-
-            if (syncing):
-                return False
-
-            return True
+            return is_ready
 
         ready_nodes = [i async for i in async_filter(check_is_ready, self.nodes)]
 
