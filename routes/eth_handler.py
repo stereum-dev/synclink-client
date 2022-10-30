@@ -21,9 +21,11 @@ from services.eth2api import ETH2API
 from validators.content_type import (ContentTypeJSON, ContentTypeSSZ,
                                      validate_content_type)
 
-api = ETH2API('http://localhost:5051')
 
 eth_router = APIRouter()
+
+api = ETH2API('http://localhost:5051')
+synclink_client = core.synclink.client
 
 
 @eth_router.get("/v1/beacon/genesis", tags=["Beacon"], response_model=GetGenesisResponse)
@@ -66,27 +68,27 @@ async def handle_eth_v2_beacon_block(block_id, content_type: str = Header(defaul
 async def handle_eth_v1_config_spec(content_type: str = Header(default=ContentTypeJSON)):
     validate_content_type(content_type, [ContentTypeJSON])
 
-    r = await api.config.spec()
+    spec = synclink_client.selected_ready_finalized_node.config.spec
 
-    return JSONResponse(r)
+    return GetSpecResponse(data=spec)
 
 
 @eth_router.get("/v1/config/deposit_contract", tags=["Config"], response_model=GetDepositContractResponse)
 async def handle_eth_v1_config_deposit_contract(content_type: str = Header(default=ContentTypeJSON)):
     validate_content_type(content_type, [ContentTypeJSON])
 
-    r = await api.config.deposit_contract()
+    deposit_contract = synclink_client.selected_ready_finalized_node.config.deposit_contract
 
-    return JSONResponse(r)
+    return GetDepositContractResponse(data=deposit_contract)
 
 
 @eth_router.get("/v1/config/fork_schedule", tags=["Config"], response_model=GetForkScheduleResponse)
 async def handle_eth_v1_config_fork_schedule(content_type: str = Header(default=ContentTypeJSON)):
     validate_content_type(content_type, [ContentTypeJSON])
 
-    r = await api.config.fork_schedule()
+    fork_epochs = synclink_client.selected_ready_finalized_node.config.fork_epochs
 
-    return JSONResponse(r)
+    return GetForkScheduleResponse(data=fork_epochs)
 
 
 @eth_router.get("/v1/node/health/", tags=["Node"])
@@ -142,8 +144,8 @@ async def handle_eth_v2_debug_beacon_state(state_id, content_type: str = Header(
     validate_content_type(content_type, [ContentTypeSSZ])
 
     if (state_id == 'finalized'):
-        syncpoint = core.synclink.client.syncpoint
-        api = core.synclink.client.selected_ready_finalized_node.api
+        syncpoint = synclink_client.syncpoint
+        api = synclink_client.selected_ready_finalized_node.api
 
         syncpoint_block = await api.beacon.block(syncpoint.finalized.root)
 
