@@ -1,15 +1,14 @@
-
 import asyncio
 import random
 from typing import List
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from config.config import logger, read
 from loguru import logger
 from models.get_state_finality_checkpoints_response_data import \
     GetStateFinalityCheckpointsResponseData
 from utils.decide_majority_checkpoint import decide_majority_checkpoint
 
+from config.config import logger, read
 from core.nodes import Nodes
 
 
@@ -51,9 +50,11 @@ class SynclinkClient():
         self.selected_ready_finalized_node = random.choice(finalized_nodes)
 
         block = await self.selected_ready_finalized_node.api.beacon.block(checkpoint.finalized.root)
-        spec = await self.selected_ready_finalized_node.api.config.spec()
 
-        if (int(block.data.message.slot) % int(spec.data['SLOTS_PER_EPOCH']) != 0):
+        await self.selected_ready_finalized_node.get_config()
+        spec = self.selected_ready_finalized_node.config.spec
+
+        if (int(block.data.message.slot) % int(spec.SLOTS_PER_EPOCH) != 0):
             if (not len(ready_nodes)):
                 logger.error('Validate error block is not finalized.')
 
