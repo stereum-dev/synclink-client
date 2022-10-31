@@ -24,7 +24,6 @@ from validators.content_type import (ContentTypeJSON, ContentTypeSSZ,
 
 eth_router = APIRouter()
 
-api = ETH2API('http://localhost:5051')
 synclink_client = core.synclink.client
 
 
@@ -32,7 +31,7 @@ synclink_client = core.synclink.client
 async def handle_eth_v1_beacon_genesis(content_type: str = Header(default=ContentTypeJSON)):
     validate_content_type(content_type, [ContentTypeJSON])
 
-    r = await api.beacon.genesis()
+    r = await synclink_client.selected_ready_finalized_node.api.beacon.genesis()
 
     return r
 
@@ -41,27 +40,27 @@ async def handle_eth_v1_beacon_genesis(content_type: str = Header(default=Conten
 async def handle_eth_v1_beacon_blocks_root(block_id, content_type: str = Header(default=ContentTypeJSON)):
     validate_content_type(content_type, [ContentTypeJSON])
 
-    r = await api.beacon.block_root(block_id)
+    r = await synclink_client.selected_ready_finalized_node.api.beacon.block_root(block_id)
 
-    return JSONResponse(r)
+    return r
 
 
 @eth_router.get("/v1/beacon/states/{state_id}/finality_checkpoints", tags=["Beacon"], response_model=GetStateFinalityCheckpointsResponse)
 async def handle_eth_v1_beacon_blocks_root(state_id, content_type: str = Header(default=ContentTypeJSON)):
     validate_content_type(content_type, [ContentTypeJSON])
 
-    r = await api.beacon.state_finality_checkpoints(state_id)
+    r = await synclink_client.selected_ready_finalized_node.api.beacon.state_finality_checkpoints(state_id)
 
-    return JSONResponse(r)
+    return r
 
 
 @eth_router.get("/v2/beacon/blocks/{block_id}", tags=["Beacon"], response_model=GetBlockV2Response)
 async def handle_eth_v2_beacon_block(block_id, content_type: str = Header(default=ContentTypeJSON)):
     validate_content_type(content_type, [ContentTypeJSON, ContentTypeSSZ])
 
-    r = await api.beacon.block(block_id)
+    r = await synclink_client.selected_ready_finalized_node.api.beacon.block(block_id)
 
-    return JSONResponse(r)
+    return r
 
 
 @eth_router.get("/v1/config/spec", tags=["Config"], response_model=GetSpecResponse)
@@ -95,46 +94,40 @@ async def handle_eth_v1_config_fork_schedule(content_type: str = Header(default=
 async def handle_eth_v1_config_fork_schedule(content_type: str = Header(default=ContentTypeJSON)):
     validate_content_type(content_type, [ContentTypeJSON])
 
-    r = await api.node.syncing()
+    r = await synclink_client.selected_ready_finalized_node.api.node.syncing()
 
-    return JSONResponse(r)
+    return r
 
 
 @eth_router.get("/v1/node/version", tags=["Node"], response_model=GetVersionResponse)
 async def handle_eth_v1_config_fork_schedule(content_type: str = Header(default=ContentTypeJSON)):
     validate_content_type(content_type, [ContentTypeJSON])
 
-    r = await api.node.version()
+    r = await synclink_client.selected_ready_finalized_node.api.node.version()
 
-    return JSONResponse(r)
+    return r
 
 
 @eth_router.get("/v1/node/peers", tags=["Node"], response_model=GetPeersResponse)
 async def handle_eth_v1_config_fork_schedule(content_type: str = Header(default=ContentTypeJSON)):
     validate_content_type(content_type, [ContentTypeJSON])
 
-    r = await api.node.peers()
+    r = await synclink_client.selected_ready_finalized_node.api.node.peers()
 
-    return JSONResponse(r)
+    return r
 
 
 @eth_router.get("/v1/node/peer_count", tags=["Node"], response_model=GetPeerCountResponse)
 async def handle_eth_v1_config_fork_schedule(content_type: str = Header(default=ContentTypeJSON)):
     validate_content_type(content_type, [ContentTypeJSON])
 
-    r = await api.node.peer_count()
+    r = await synclink_client.selected_ready_finalized_node.api.node.peer_count()
 
-    return JSONResponse(r)
+    return r
 
 
 @eth_router.get("/v2/debug/beacon/states/{state_id}", tags=["Debug"], response_model=GetStateV2Response)
 async def handle_eth_v2_debug_beacon_state(state_id, content_type: str = Header(default=ContentTypeSSZ)):
     validate_content_type(content_type, [ContentTypeSSZ])
 
-    if (state_id == 'finalized'):
-        syncpoint = synclink_client.syncpoint
-        api = synclink_client.selected_ready_finalized_node.api
-
-        syncpoint_block = await api.beacon.block(syncpoint.finalized.root)
-
-        return StreamingResponse(api.debug.bacon_state(state_id=syncpoint_block.data.message.slot), headers={"Content-Type": "application/json"})
+    return StreamingResponse(synclink_client.selected_ready_finalized_node.api.debug.bacon_state(state_id=state_id), headers={"Content-Type": "application/json"})
