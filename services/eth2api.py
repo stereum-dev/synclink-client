@@ -49,6 +49,11 @@ class BeaconAPI(API):
     async def block(self, block_id) -> GetBlockV2Response:
         return await self.request(f"/eth/v2/beacon/blocks/{block_id}")
 
+    def block_ssz(self, block_id):
+        with httpx.stream("GET", urljoin(self.apiUrl, f"/eth/v2/beacon/blocks/{block_id}"), headers={'Accept': 'application/octet-stream'}) as response:
+            for chunk in response.iter_bytes():
+                yield chunk
+
 
 @serialize_all_methods()
 class ConfigAPI(API):
