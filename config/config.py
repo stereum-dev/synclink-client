@@ -1,28 +1,34 @@
-import string
-from platform import node
+import os
 from typing import List
 
 import yaml
-from loguru import logger
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
+
+ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+
+CONFIG_PATH = os.path.join(
+    ROOT_DIR, '../', 'config.yaml')
 
 
 class AppConfig(BaseModel):
-    addr: str
-    port: int
-    nodes: List[str]
+    addr: str = Field(alias="addr", default="0.0.0.0")
+    port: int = Field(alias="port", default=9000)
+    nodes: List[str] = Field(alias="nodes", default=[])
 
 
 def read(file_name):
-    defaultConfig: AppConfig = {
-        "addr": "0.0.0.0",
-        "port": 9000,
-        "nodes": ["http://localhost:8000"],
-    }
+    try:
+        with open(file_name, "r") as f:
+            yamlConfig: AppConfig = yaml.load(f, Loader=yaml.FullLoader) or {}
 
-    with open(file_name, "r") as f:
-        yamlConfig: AppConfig = yaml.load(f, Loader=yaml.FullLoader) or {}
+            config = AppConfig(**yamlConfig)
 
-    config: AppConfig = {**defaultConfig, **yamlConfig}
+            return config
 
-    return config
+    except:
+
+        return AppConfig()
+
+
+def get_app_config():
+    return read(CONFIG_PATH)

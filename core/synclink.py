@@ -8,7 +8,7 @@ from models.get_state_finality_checkpoints_response_data import \
     GetStateFinalityCheckpointsResponseData
 from utils.decide_majority_checkpoint import decide_majority_checkpoint
 
-from config.config import logger, read
+from config.config import get_app_config
 from core.nodes import Nodes
 
 
@@ -65,7 +65,6 @@ class SynclinkClient():
 
     async def start(self):
         logger.info('Searching for at least one ready node...')
-
         ready_nodes = await self.nodes.get_readies()
         while not len(ready_nodes):
             logger.warning('No ready node found! Will try in 5 sec..')
@@ -82,8 +81,6 @@ class SynclinkClient():
             await self.check_final_checkpoint()
             await asyncio.sleep(10)
 
-        logger.success(f"Ready to use...")
-
         self.scheduler = AsyncIOScheduler()
 
         self.scheduler.add_job(self.get_head_finality, 'interval', seconds=10)
@@ -94,5 +91,5 @@ class SynclinkClient():
         self.scheduler.start()
 
 
-config = read('config.yaml')
-client = SynclinkClient(config['nodes'])
+config = get_app_config()
+client = SynclinkClient(config.nodes)

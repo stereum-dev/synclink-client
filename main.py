@@ -1,8 +1,8 @@
+import uvicorn
 from fastapi import FastAPI
 from loguru import logger
-import uvicorn
 
-from config.config import read
+from config.config import get_app_config
 from config.logger import LOG_LEVEL, UVICORN_LOGGING_CONFIG, setup_logging
 from core.functions import startup
 from routes.eth_handler import eth_router
@@ -24,13 +24,10 @@ async def startup_event():
 
 
 if __name__ == "__main__":
-    config = read('config.yaml')
+    config = get_app_config()
 
-    docs_addr = config['addr'] if config['addr'] != "0.0.0.0" else "127.0.0.1"
-    docs_port = config['port']
+    docs_addr = config.addr if config.addr != "0.0.0.0" else "127.0.0.1"
+    docs_port = config.port
 
-    logger.info(
-        f"Server starting, find API docs at http://{docs_addr}:{docs_port}/docs")
-
-    uvicorn.run("main:app", host=config['addr'],
-                port=config['port'], reload=True, log_config=UVICORN_LOGGING_CONFIG)
+    uvicorn.run("main:app", host=config.addr,
+                port=config.port, reload=True, log_config=UVICORN_LOGGING_CONFIG)
