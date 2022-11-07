@@ -1,34 +1,95 @@
-import os
-from typing import List
+"""
+Initialization and validation of the hierarchical config files and CLI arguments.
+"""
+from typing import Dict
+from os.path import exists as file_exists
+from .omegaconf import OmegaConfArgparse as OmegaConf, DictConfig
+from .definition import Schema, cli_args
 
-import yaml
-from pydantic import BaseModel, Field
+class Config():
 
-ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+    _schema: object
+    _cli_args: Dict
+    _strict: bool = True
+    _config: DictConfig
+    _user_config_filepath: str
+    _initialized: bool = False
 
-CONFIG_PATH = os.path.join(
-    ROOT_DIR, '../', 'config.yaml')
+    @classmethod
+    def init(
+        cls,
+        schema: object,
+        cli_args: Dict = {},
+        strict: bool = True
+    ) -> DictConfig:
+        cls._initialized = True
+        cls._schema = schema
+        cls._cli_args = cli_args
+        cls._strict = strict
+        cls._setup_schema()
+        cls._setup_user_config();
+        #cls._setup_cli_config_omega();
+        cls._setup_cli_config_argparse();
+        cls._validate_and_resove();
+        return cls._config
 
+    @classmethod
+    def _is_private(cls):
+        if not cls._initialized: raise RuntimeError("invalid call on private method")
 
-class AppConfig(BaseModel):
-    addr: str = Field(alias="addr", default="0.0.0.0")
-    port: int = Field(alias="port", default=9000)
-    nodes: List[str] = Field(alias="nodes", default=[])
+    @classmethod
+    def _setup_schema(cls,lala="",lolo=""):
+        cls._is_private()
+        cls._config = OmegaConf.structured(cls._schema)
+        cls._user_config_filepath = cls._config['config']
 
+    @classmethod
+    def _setup_user_config(cls):
+        cls._is_private()
+        if file_exists(cls._user_config_filepath):
+            try:
+                cls._config = OmegaConf.merge(cls._config, OmegaConf.load(cls._user_config_filepath))
+                if cls._config['config'] != cls._user_config_filepath and (cls._strict or file_exists(cls._config['config'])):
+                    cls._config = OmegaConf.merge(cls._config, OmegaConf.load(cls._config['config']))
+                    cls._user_config_filepath = cls._config['config']
+            except Exception as e:
+                if cls._strict:
+                    raise Exception(e)
+                pass
 
-def read(file_name):
-    try:
-        with open(file_name, "r") as f:
-            yamlConfig: AppConfig = yaml.load(f, Loader=yaml.FullLoader) or {}
+    @classmethod
+    def _setup_cli_config_omega(cls):
+        cls._is_private()
+        if file_exists(cls._user_config_filepath):
+            try:
+                cls._config = OmegaConf.merge(cls._config, OmegaConf.load(cls._user_config_filepath))
+                if cls._config['config'] != cls._user_config_filepath and (cls._strict or file_exists(cls._config['config'])):
+                    cls._config = OmegaConf.merge(cls._config, OmegaConf.load(cls._config['config']))
+                    cls._user_config_filepath = cls._config['config']
+            except Exception as e:
+                if cls._strict:
+                    raise Exception(e)
+                pass
 
-            config = AppConfig(**yamlConfig)
+    @classmethod
+    def _setup_cli_config_argparse(cls):
+        cls._is_private()
+        try:
+            from_cli = OmegaConf.from_argparse(cls._cli_args)
+            cls._config = OmegaConf.merge(cls._config, from_cli)
+            if cls._config['config'] != cls._user_config_filepath and (cls._strict or file_exists(cls._config['config'])):
+                cls._config = OmegaConf.merge(cls._config, OmegaConf.load(cls._config['config']))
+                cls._config = OmegaConf.merge(cls._config, from_cli)
+        except Exception as e:
+            if cls._strict:
+                raise Exception(e)
+            pass
 
-            return config
+    @classmethod
+    def _validate_and_resove(cls):
+        cls._is_private()
+        OmegaConf.to_object(cls._config)
+        OmegaConf.resolve(cls._config)
+        cls._initialized = False
 
-    except:
-
-        return AppConfig()
-
-
-def get_app_config():
-    return read(CONFIG_PATH)
+config = Config.init(Schema,cli_args)

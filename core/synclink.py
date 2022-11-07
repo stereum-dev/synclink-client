@@ -8,7 +8,7 @@ from models.get_state_finality_checkpoints_response_data import \
     GetStateFinalityCheckpointsResponseData
 from utils.decide_majority_checkpoint import decide_majority_checkpoint
 
-from config.config import get_app_config
+from config.config import config
 from core.nodes import Nodes
 
 
@@ -91,5 +91,4 @@ class SynclinkClient():
         self.scheduler.start()
 
 
-config = get_app_config()
 client = SynclinkClient(config.nodes)

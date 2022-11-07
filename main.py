@@ -2,7 +2,7 @@ import uvicorn
 from fastapi import FastAPI
 from loguru import logger
 
-from config.config import get_app_config
+from config.config import config
 from config.logger import LOG_LEVEL, UVICORN_LOGGING_CONFIG, setup_logging
 from core.functions import startup
 from routes.eth_handler import eth_router
@@ -24,7 +24,6 @@ async def startup_event():
 
 
 if __name__ == "__main__":
-    config = get_app_config()
 
     docs_addr = config.addr if config.addr != "0.0.0.0" else "127.0.0.1"
     docs_port = config.port
