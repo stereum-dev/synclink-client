@@ -1,8 +1,6 @@
 import core.synclink
-from config.config import get_app_config
+from config.config import config
 from loguru import logger
-
-config = get_app_config()
 
 
 async def startup():

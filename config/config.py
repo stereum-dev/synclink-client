@@ -1,34 +1,64 @@
-import os
-from typing import List
+"""
+Initialization and validation of the hierarchical config files and CLI arguments.
+"""
+from os.path import exists as file_exists
+from .omegaconf import OmegaConfArgparse as OmegaConf
+from .definition import Config, cli_args
 
-import yaml
-from pydantic import BaseModel, Field
+#
+# DEV SETTINGS
+#
 
-ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+# Use strict configuration?
+# True = Abort if specified config files does not exist or invalid/unknon arguments are present
+# False = Ignore none existing config files and unknown or invalid arguments and continue with default values instead
+strict = True
 
-CONFIG_PATH = os.path.join(
-    ROOT_DIR, '../', 'config.yaml')
+#
+# INIT
+#
 
+# Setup config schema with defaults
+config = OmegaConf.structured(Config)
+user_config_filepath = config['config']
 
-class AppConfig(BaseModel):
-    addr: str = Field(alias="addr", default="0.0.0.0")
-    port: int = Field(alias="port", default=9000)
-    nodes: List[str] = Field(alias="nodes", default=[])
-
-
-def read(file_name):
+# Setup user config (only if the file exists -> was created by the user)
+if file_exists(user_config_filepath):
     try:
-        with open(file_name, "r") as f:
-            yamlConfig: AppConfig = yaml.load(f, Loader=yaml.FullLoader) or {}
+        config = OmegaConf.merge(config, OmegaConf.load(user_config_filepath))
+        if config['config'] != user_config_filepath and (strict or file_exists(config['config'])):
+            config = OmegaConf.merge(config, OmegaConf.load(config['config']))
+            user_config_filepath = config['config']
+    except Exception as e:
+        if strict:
+            raise Exception(e)
+        pass
 
-            config = AppConfig(**yamlConfig)
+# Setup CLI config (the original omegaconf way - does not support dashed cli args)
+# try:
+#     config = OmegaConf.merge(config, OmegaConf.from_cli())
+#     if config['config'] != user_config_filepath and (strict or file_exists(config['config'])):
+#         config = OmegaConf.merge(config, OmegaConf.load(config['config']))
+#         # config file was specified on CLI however at the end further CLI arguments must win
+#         config = OmegaConf.merge(config, OmegaConf.from_cli())v[
+# except Exception as e:
+#     if strict:
+#         raise Exception(e)
+#     pass
 
-            return config
+# Setup CLI config via argparse (supports dashed CLI args, help and similar useful stuff)
+try:
+    from_cli = OmegaConf.from_argparse(cli_args)
+    config = OmegaConf.merge(config, from_cli)
+    if config['config'] != user_config_filepath and (strict or file_exists(config['config'])):
+        config = OmegaConf.merge(config, OmegaConf.load(config['config']))
+        # config file was specified on CLI however at the end further CLI arguments must win
+        config = OmegaConf.merge(config, from_cli)
+except Exception as e:
+    if strict:
+        raise Exception(e)
+    pass
 
-    except:
-
-        return AppConfig()
-
-
-def get_app_config():
-    return read(CONFIG_PATH)
+# Validate and resolve (but dont convert and keep as DictConfig)
+OmegaConf.to_object(config)
+OmegaConf.resolve(config)
