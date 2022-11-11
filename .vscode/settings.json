@@ -1,0 +1,13 @@
+{
+    "cSpell.ignoreWords": [
+        "Synclink",
+        "apiclient_pydantic",
+        "apscheduler",
+        "fastapi",
+        "httpx",
+        "loguru",
+        "pydantic",
+        "syncpoint",
+        "uvicorn"
+    ]
+}
