@@ -56,12 +56,10 @@ async def handle_eth_v1_beacon_blocks_root(state_id, content_type: str = Header(
 
 @eth_router.get("/v2/beacon/blocks/{block_id}", tags=["Beacon"], response_model=GetBlockV2Response)
 async def handle_eth_v2_beacon_block(block_id, accept: str = Header(default=ContentTypeJSON)):
-    validate_content_type(accept, [ContentTypeJSON, ContentTypeSSZ])
-
     api = synclink_client.selected_ready_finalized_node.api
 
-    if (accept == ContentTypeSSZ):
-        return StreamingResponse(api.beacon.block_ssz(block_id=block_id), headers={"Content-Type": "application/json"})
+    if (ContentTypeSSZ in accept):
+        return StreamingResponse(api.beacon.block_ssz(block_id=block_id), headers={"Content-Type": "application/octet-stream"})
 
     r = await api.beacon.block(block_id)
 
@@ -135,4 +133,4 @@ async def handle_eth_v1_config_fork_schedule(content_type: str = Header(default=
 async def handle_eth_v2_debug_beacon_state(state_id, content_type: str = Header(default=ContentTypeSSZ)):
     validate_content_type(content_type, [ContentTypeSSZ])
 
-    return StreamingResponse(synclink_client.selected_ready_finalized_node.api.debug.bacon_state(state_id=state_id), headers={"Content-Type": "application/json"})
+    return StreamingResponse(synclink_client.selected_ready_finalized_node.api.debug.bacon_state(state_id=state_id), headers={"Content-Type": "application/octet-stream"})
