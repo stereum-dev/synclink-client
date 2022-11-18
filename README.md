@@ -49,14 +49,15 @@ pip install -r requirements.txt
 1. Copy `config.yaml.example` to `config.yaml`
 2. Define settings in `config.yaml` as desired
 
-| Name            | Description                                      | Default                 | Required |
-| --------------- | ------------------------------------------------ | ----------------------- | -------- |
-| addr            | The IP address or domain for the SyncLink Client | 0.0.0.0                 | No       |
-| port            | The port for the SyncLink Client                 | 9000                    | No       |
-| nodes           | List of URLs to your SyncLink Server Nodes       | [http://localhost:8000] | Yes      |
+| Name  | Description                                      | Default                 | Required |
+| ----- | ------------------------------------------------ | ----------------------- | -------- |
+| addr  | The IP address or domain for the SyncLink Client | 0.0.0.0                 | No       |
+| port  | The port for the SyncLink Client                 | 9000                    | No       |
+| nodes | List of URLs to your SyncLink Server Nodes       | [http://localhost:8000] | Yes      |
 
 Optional you can also specify the path to your config file or add/overwrite this arguments on the command line.
 Run `python main.py -h` for details.
+
 ## Run the App
 
 Activate the virtual environment and run the app.
@@ -90,6 +91,13 @@ curl -X GET http://127.0.0.1:9000/eth/v2/debug/beacon/states/finalized > ~/syncl
 This should download a checkpoint file to `~/synclinktestdata.json` with a size of about 50-100MB.
 
 > Depending on your settings in `config.yaml` you may need to adjust the ip address and port as needed (127.0.0.1:9000 is the default).
+
+## Run tests
+
+```
+python -m pytest
+```
+
 ## Stop the App
 
 If you're done you can stop the Python process and deactivate the virtual environment by typing the following in your active terminal:
