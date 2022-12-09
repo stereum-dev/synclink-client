@@ -2,45 +2,29 @@ from urllib.parse import urljoin
 
 import httpx
 from apiclient_pydantic import serialize_all_methods
-from core.config import Config
-from loguru import logger
+
+from models.get_block_root_response import GetBlockRootResponse
 from models.get_block_v2_response import GetBlockV2Response
+from models.get_deposit_contract_response import GetDepositContractResponse
+from models.get_fork_schedule_response import GetForkScheduleResponse
+from models.get_genesis_response import GetGenesisResponse
+from models.get_peer_count_response import GetPeerCountResponse
+from models.get_peers_response import GetPeersResponse
 from models.get_spec_response import GetSpecResponse
 from models.get_state_finality_checkpoints_response import \
     GetStateFinalityCheckpointsResponse
 from models.get_syncing_status_response import GetSyncingStatusResponse
+from models.get_version_response import GetVersionResponse
 
-
-class API:
-    def __init__(self, apiUrl):
-        self.apiUrl = apiUrl
-        self.client = httpx.AsyncClient(base_url=apiUrl)
-
-    async def request(self, url_path):
-        try:
-            response = await self.client.get(url_path)
-            response.raise_for_status()
-
-            return response.json()
-        except Exception as exc:
-            logger.error(f"ERROR: {exc}")
-
-
-@serialize_all_methods()
-class SynclinkClientAPI(API):
-    async def config(self) -> Config:
-        return await self.request('/synclink/v1/config')
-
-    async def is_ready(self):
-        return await self.client.get('/synclink/v1/ready')
+from .base_api import API
 
 
 @serialize_all_methods()
 class BeaconAPI(API):
-    async def genesis(self):
+    async def genesis(self) -> GetGenesisResponse:
         return await self.request('/eth/v1/beacon/genesis')
 
-    async def block_root(self, block_id):
+    async def block_root(self, block_id) -> GetBlockRootResponse:
         return await self.request(f"/eth/v1/beacon/blocks/{block_id}/root")
 
     async def state_finality_checkpoints(self, state_id) -> GetStateFinalityCheckpointsResponse:
@@ -60,10 +44,10 @@ class ConfigAPI(API):
     async def spec(self) -> GetSpecResponse:
         return await self.request('/eth/v1/config/spec')
 
-    async def deposit_contract(self):
+    async def deposit_contract(self) -> GetDepositContractResponse:
         return await self.request('/eth/v1/config/deposit_contract')
 
-    async def fork_schedule(self):
+    async def fork_schedule(self) -> GetForkScheduleResponse:
         return await self.request('/eth/v1/config/fork_schedule')
 
 
@@ -75,13 +59,13 @@ class NodeAPI(API):
     async def syncing(self) -> GetSyncingStatusResponse:
         return await self.request('/eth/v1/node/syncing')
 
-    async def version(self):
+    async def version(self) -> GetVersionResponse:
         return await self.request('/eth/v1/node/version')
 
-    async def peers(self):
+    async def peers(self) -> GetPeersResponse:
         return await self.request('/eth/v1/node/peers')
 
-    async def peer_count(self):
+    async def peer_count(self) -> GetPeerCountResponse:
         return await self.request('/eth/v1/node/peer_count')
 
 
@@ -93,9 +77,8 @@ class DebugAPI(API):
 
 
 class ETH2API:
-    def __init__(self, apiUrl):
+    def __init__(self, apiUrl: str):
         self.apiUrl = apiUrl
-        self.synclink_server = SynclinkClientAPI(self.apiUrl)
         self.beacon = BeaconAPI(self.apiUrl)
         self.config = ConfigAPI(self.apiUrl)
         self.node = NodeAPI(self.apiUrl)
