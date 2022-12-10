@@ -1,0 +1,19 @@
+# development configuration - builds the image locally:
+# docker-compose --project-name dev-synclink-client -f docker-compose.dev.yaml up
+# docker-compose --project-name dev-synclink-client -f docker-compose.dev.yaml up -d
+services:
+  synclink-client:
+    container_name: dev-synclink-client
+    image: dev/synclink-client
+    pull_policy: build
+    build: .
+    ports:
+      - "9000:9000"
+    # volumes:
+    #   - ./config.yaml:/code/config.yaml
+    environment:
+      DOCK_ENV: 'dev'
+      # SYLI_ADDR: 0.0.0.0
+      # SYLI_PORT: 9000
+      SYLI_NODE_1: http://localhost:8000
+      SYLI_NODE_2: http://host.docker.internal:8000
