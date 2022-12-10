@@ -1,0 +1,18 @@
+# production configuration - loads the image from docker hub:
+# docker-compose --project-name synclink-client up
+# docker-compose --project-name synclink-client up -d
+services:
+  synclink-client:
+    container_name: synclink-client
+    image: stereum/synclink-client:latest
+    restart: always
+    ports:
+      - "8000:8000"
+    # volumes:
+    #   - ./config.yaml:/code/config.yaml
+    environment:
+      DOCK_ENV: 'prod'
+      # SYLI_ADDR: 0.0.0.0
+      # SYLI_PORT: 9000
+      SYLI_NODE_1: http://localhost:8000
+      SYLI_NODE_2: http://host.docker.internal:8000

@@ -1,3 +1,6 @@
-port: 9000
+# config file example
+# addr: 0.0.0.0
+# port: 9000
 nodes: 
   - http://localhost:8000
+  - http://host.docker.internal:8000
