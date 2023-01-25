@@ -66,7 +66,7 @@ You can use the SyncLink Client as described in this document however during dev
 
 # Usage
 
-There are multiple ways you can configure and run the SyncLink Client application. While [the recommended setup for production environments is Docker](#run-with-docker), it is also possible to [run the app directly from source with Python](#run-from-source), which is mostly preferred for develpment on your local system, however also an absolutely valid setup for production.
+There are multiple ways you can configure and run the SyncLink Client application. While [the recommended setup for production environments is Docker](#run-with-docker), it is also possible to [run the app directly from source with Python](#run-from-source), which is mostly preferred for development on your local system, however also an absolutely valid setup for production.
 
 ## Configuration
 
@@ -83,7 +83,7 @@ The SyncLink Client [options](#options) must be configured either thru a yaml [c
 
 ### Config file
 
-By default the SyncLink Client attempts to read the configuration from `config.yaml`. The path to this file can however explicitely specified by [command line arguments](#command-line-arguments) or [environment variables](#environment-variables). The configuration management also supports a hierarchical config structure, which means you can optionally add the ["_config_" option](#options) within a config file to load additional settings from a separate config file.
+By default the SyncLink Client attempts to read the configuration from `config.yaml`. The path to this file can however explicitly specified by [command line arguments](#command-line-arguments) or [environment variables](#environment-variables). The configuration management also supports a hierarchical config structure, which means you can optionally add the ["_config_" option](#options) within a config file to load additional settings from a separate config file.
 
 Example `config.yaml` (see [config.yaml.example](./config.yaml.example)):
 ```
@@ -126,7 +126,7 @@ python main.py
 ```
 will be converted to `python main.py --node "10.0.0.1" --node "10.0.0.2"`.
 
-If you have accidently specified an environment variable that is not supported (see [options](#options)), you need to unset the variable to avoid an error. For example:
+If you have accidentally specified an environment variable that is not supported (see [options](#options)), you need to unset the variable to avoid an error. For example:
 
 ```
 export SYLI_BLA="12345"
@@ -209,7 +209,7 @@ deactivate
 
 Contributions are greatly appreciated and pull requests will be reviewed/merged ASAP!
 
-If you're interested in improving the SyncLink Client please follow this steps:
+If you're interested in improving the SyncLink Client please follow these steps:
 
 1. Fork the project
 2. Create your feature branch:
@@ -224,7 +224,7 @@ If you're interested in improving the SyncLink Client please follow this steps:
 
 ### Unit Testing and Linting
 
-All pull requests running thru automated tests. It is recommended to run this tests locally before you open a pull request.
+All pull requests running thru automated tests. It is recommended to run these tests locally before you open a pull request.
 
 - Setup your local development environment, thus you're able to [run from source](#run-from-source)
 - Execute `pytest` to run Unit Tests (where no errors as result means passed)
@@ -238,8 +238,8 @@ To get in touch just [join the Stereum Discord server](https://discord.gg/8Znj8K
 
 # Docker Examples
 
-Below you'll find a few practical examples how to start and stop the SyncLink Client with `docker run` or `docker compose` commands. 
-Keep in mind that this examples should just give you a hint - it is absolutely your freedom of choice how to run the SyncLink Client!
+Below you'll find a few practical examples of how to start and stop the SyncLink Client with `docker run` or `docker compose` commands. 
+Keep in mind that these examples should just give you a hint - it is absolutely your freedom of choice how to run the SyncLink Client!
 For more details regarding Docker just visit [https://docs.docker.com](https://docs.docker.com/).
 
 **Generic description of the used Docker commands**
