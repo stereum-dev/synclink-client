@@ -62,10 +62,11 @@ You can use the SyncLink Client as described in this document however during dev
 
 | Client     | Support |
 | ---------- | ------- |
-| Teku       | ✅      |
-| Nimbus     | ✅      |
 | Lighthouse | ✅      |
+| Lodestar   | ✅      |
+| Nimbus     | ✅      |
 | Prysm      | ✅      |
+| Teku       | ✅      |
 
 # Usage
 
