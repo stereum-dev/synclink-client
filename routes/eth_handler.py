@@ -93,8 +93,16 @@ async def handle_eth_v1_config_fork_schedule(content_type: str = Header(default=
     return GetForkScheduleResponse(data=fork_epochs)
 
 
+@eth_router.get("/v1/node/health", tags=["Node"])
+async def handle_eth_v1_node_health():
+
+    r = await synclink_client.selected_ready_finalized_node.api.node.health()
+
+    return Response(status_code=r.status_code)
+
+
 @eth_router.get("/v1/node/syncing", tags=["Node"], response_model=GetSyncingStatusResponse)
-async def handle_eth_v1_config_fork_schedule(content_type: str = Header(default=ContentTypeJSON)):
+async def handle_eth_v1_node_syncing(content_type: str = Header(default=ContentTypeJSON)):
     validate_content_type(content_type, [ContentTypeJSON])
 
     r = await synclink_client.selected_ready_finalized_node.api.node.syncing()
@@ -103,7 +111,7 @@ async def handle_eth_v1_config_fork_schedule(content_type: str = Header(default=
 
 
 @eth_router.get("/v1/node/version", tags=["Node"], response_model=GetVersionResponse)
-async def handle_eth_v1_config_fork_schedule(content_type: str = Header(default=ContentTypeJSON)):
+async def handle_eth_v1_node_version(content_type: str = Header(default=ContentTypeJSON)):
     validate_content_type(content_type, [ContentTypeJSON])
 
     r = await synclink_client.selected_ready_finalized_node.api.node.version()
@@ -112,7 +120,7 @@ async def handle_eth_v1_config_fork_schedule(content_type: str = Header(default=
 
 
 @eth_router.get("/v1/node/peers", tags=["Node"], response_model=GetPeersResponse)
-async def handle_eth_v1_config_fork_schedule(content_type: str = Header(default=ContentTypeJSON)):
+async def handle_eth_v1_node_peers(content_type: str = Header(default=ContentTypeJSON)):
     validate_content_type(content_type, [ContentTypeJSON])
 
     r = await synclink_client.selected_ready_finalized_node.api.node.peers()
@@ -121,7 +129,7 @@ async def handle_eth_v1_config_fork_schedule(content_type: str = Header(default=
 
 
 @eth_router.get("/v1/node/peer_count", tags=["Node"], response_model=GetPeerCountResponse)
-async def handle_eth_v1_config_fork_schedule(content_type: str = Header(default=ContentTypeJSON)):
+async def handle_eth_v1_node_peer_count(content_type: str = Header(default=ContentTypeJSON)):
     validate_content_type(content_type, [ContentTypeJSON])
 
     r = await synclink_client.selected_ready_finalized_node.api.node.peer_count()
@@ -133,3 +141,6 @@ async def handle_eth_v1_config_fork_schedule(content_type: str = Header(default=
 async def handle_eth_v2_debug_beacon_state(state_id, accept: str = Header(default=ContentTypeSSZ)):
     if (ContentTypeSSZ in accept):
         return StreamingResponse(synclink_client.selected_ready_finalized_node.api.debug.bacon_state(state_id=state_id), headers={"Content-Type": "application/octet-stream"})
+    
+    #return StreamingResponse(synclink_client.selected_ready_finalized_node.api.debug.bacon_state(state_id=state_id), headers={"Content-Type": "application/json"})
+    return Response(status_code=415) # if we dont support json in the client then respond a proper error header instead

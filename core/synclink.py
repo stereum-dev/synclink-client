@@ -32,11 +32,12 @@ class SynclinkClient():
 
         final_head_checkpoint = decide_majority_checkpoint(checkpoints)
 
-        if (not self.head or (not self.head.finalized) or (self.head.finalized.root != final_head_checkpoint.finalized.root)):
-            self.head = final_head_checkpoint.copy()
+        if final_head_checkpoint:
+            if (not self.head or (not self.head.finalized) or (self.head.finalized.root != final_head_checkpoint.finalized.root)):
+                self.head = final_head_checkpoint.copy()
 
     async def check_final_checkpoint(self):
-        if (not (self.head or self.head.finalized)):
+        if not self.head or not self.head.finalized:
             return
 
         if (self.syncpoint.finalized != None and self.head.finalized.epoch == self.syncpoint.finalized.epoch):
