@@ -93,6 +93,14 @@ async def handle_eth_v1_config_fork_schedule(content_type: str = Header(default=
     return GetForkScheduleResponse(data=fork_epochs)
 
 
+@eth_router.get("/v1/node/health", tags=["Node"])
+async def handle_eth_v1_node_health():
+
+    r = await synclink_client.selected_ready_finalized_node.api.node.health()
+
+    return Response(status_code=r.status_code)
+
+
 @eth_router.get("/v1/node/syncing", tags=["Node"], response_model=GetSyncingStatusResponse)
 async def handle_eth_v1_config_fork_schedule(content_type: str = Header(default=ContentTypeJSON)):
     validate_content_type(content_type, [ContentTypeJSON])
